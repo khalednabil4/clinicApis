@@ -43,7 +43,11 @@ INSTALLED_APPS = [
     'User',
     'patient',
     'Appointments',
-    'Clinic'
+    'Clinic',
+    'Service',
+    'Reservation',
+    'Payment',
+    'Package'
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

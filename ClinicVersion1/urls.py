@@ -20,6 +20,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('User/', include("User.url")),
     path('patient/', include("patient.url")),
-    path('Appointments/',include("Appointments.url"))
+    path('Appointments/',include("Appointments.url")),
+    path('Clinic/',include("Clinic.url")),
+    path('Service/',include("Service.url")),
+    path('Reservation/', include("Reservation.url")),
+    path('Payment/', include("Payment.url")),
+    path('Package/', include("Package.url"))
 
 ]

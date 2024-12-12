@@ -1,11 +1,12 @@
 from django.db import models
 from User.models import *
 # Create your models here.
+
 class patient(CustomUser):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=100, unique=True, blank=True, null=True)
     profile_img = models.ImageField(blank=True,null=True,upload_to='patient', default='/patient/account.png')
-    Organization = models.ForeignKey(Organization, related_name='Clinic', null=True, on_delete=models.PROTECT)
+    Organization = models.ForeignKey(Organization, related_name='patient', null=True, on_delete=models.PROTECT)
     birth_date = models.DateField(null=True)
     is_deleted = models.BooleanField(default=False)
     objects = SoftDeletionManager()
@@ -33,3 +34,19 @@ class patient(CustomUser):
         if not self.code:
             self.code = generate_unique_code()  # Generate unique code
         super().save(*args, **kwargs)
+
+
+
+class PatientHistory(models.Model):
+    DateTO=models.DateField()
+    DateFrom=models.DateField()
+    Doctor=models.CharField(max_length=50,blank=True,null=True)
+    Doc = models.ImageField(blank=True, null=True, upload_to='PatientDoc')
+    patient= models.ForeignKey(patient, on_delete=models.CASCADE, related_name='PatientHistory')
+    PatientVitals=models.JSONField(null=True,blank=True)
+    Note=models.TextField(blank=True,null=True)
+    is_deleted = models.BooleanField(default=False)
+    objects = SoftDeletionManager()
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()

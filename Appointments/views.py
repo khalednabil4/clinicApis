@@ -88,7 +88,32 @@ class getDaysListFiltered(APIView):
 
 
 
+class ScheduleOp(GenralCRUD):
+    permission_classes = [IsAuthenticated]
+    model = Schedule
+    serializer_class = ScheduleCreateSerializer
+    serializer_class_view= ScheduleSerializer
 
+
+
+class getScheduleListFiltered(APIView):
+        permission_classes = [IsAuthenticated]
+
+        @handle_api_exception(error_message="Not Found", code=400)
+        def get(self, request):
+            if  request.user.is_superuser:
+                data = Schedule.objects.all()
+            else:
+
+                client = Administrator.objects.get(id=request.user.id)
+                data = Schedule.objects.filter(clinic__Specialist__Organization=client.Organization)
+            serializer = ScheduleSerializer(data, many=True)
+            response_data = {
+                'count': data.count(),
+                'data': serializer.data
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
 
 class DoctoravailabilityOp(GenralCRUD):
     permission_classes = [IsAuthenticated]

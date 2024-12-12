@@ -7,7 +7,10 @@ from rest_framework_simplejwt.views import (
 )
 urlpatterns = [
 
-
-
+    path('ClinicOp/add/', ClinicOp.as_view()),
+    path('ClinicOp/edit/<int:pk>/', ClinicOp.as_view()),
+    path('ClinicOp/delete/<int:pk>/', ClinicOp.as_view()),
+    path('ClinicById/<int:pk>/', ClinicOp.as_view()),
+    path('getClinicListFiltered/', getClinicListFiltered.as_view()),
 
 ]

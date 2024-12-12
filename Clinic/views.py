@@ -24,9 +24,11 @@ class GenralCRUD(APIView):
         except self.model.DoesNotExist:
             raise Http404
     def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = {'request': self.request}
         return self.serializer_class(*args, **kwargs)
 
     def get_serializer_viw(self, *args, **kwargs):
+        kwargs['context'] = {'request': self.request}
         return self.serializer_class_view(*args, **kwargs)
     @handle_api_exception(error_message="Add False", code=500)
     def post(self, request, format=None):
@@ -57,26 +59,26 @@ class GenralCRUD(APIView):
             instance.delete()
             return Response({"data": "Delete successful"}, status=status.HTTP_200_OK)
 
-class daysOp(GenralCRUD):
+class ClinicOp(GenralCRUD):
     permission_classes = [IsAuthenticated]
-    model = Days
-    serializer_class = DaysCreateSerializer
-    serializer_class_view=DaysSerializer
+    model = Clinic
+    serializer_class = ClinicCreateSerializer
+    serializer_class_view=ClinicSerializer
 
 
 
-class getDaysListFiltered(APIView):
+class getClinicListFiltered(APIView):
         permission_classes = [IsAuthenticated]
 
         @handle_api_exception(error_message="Not Found", code=400)
         def get(self, request):
-            if  request.user.is_superuser:
-                data = Days.objects.all()
+            if   request.user.is_superuser:
+                data = Clinic.objects.all()
             else:
 
                 client = Administrator.objects.get(id=request.user.id)
-                data = Days.objects.filter(Admin__Organization=client.Organization)
-            serializer = DaysSerializer(data, many=True)
+                data = Clinic.objects.filter(Specialist__Organization=client.Organization)
+            serializer = ClinicSerializer(data, many=True)
             response_data = {
                 'count': data.count(),
                 'data': serializer.data

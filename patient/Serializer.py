@@ -1,7 +1,5 @@
 from rest_framework import serializers
-
 from User.Serializer import *
-
 from  .models import *
 class PatientProfileSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
@@ -36,3 +34,31 @@ class PatientCreateSerializer(serializers.ModelSerializer):
             if groups:
                 patient.groups.set(groups)
             return patient
+
+class PatientHistorySerializer(serializers.ModelSerializer):
+    patient = PatientProfileSerializer()
+    class Meta:
+        model = PatientHistory
+        fields = "__all__"
+
+
+class PatientHistoryCreateSerializer(serializers.ModelSerializer):
+    patient = serializers.PrimaryKeyRelatedField(
+        queryset=patient.objects.all(),
+        required=False
+    )
+    class Meta:
+        model = PatientHistory
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+
+
+        request = kwargs.get('context', {}).get('request', None)
+        if  request.user.is_superuser:
+            self.fields['patient'].queryset = patient.objects.all()
+        else:
+            client = Administrator.objects.get(id=request.user.id)
+            self.fields['patient'].queryset = patient.objects.filter(Organization=client.Organization)
+
+        super().__init__(*args, **kwargs)

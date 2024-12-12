@@ -69,7 +69,7 @@ class Organization(models.Model):
 class Specialist(models.Model):
     name=models.CharField(max_length=100)
     is_deleted = models.BooleanField(default=False)
-    Organization = models.ForeignKey(Organization, related_name='Specialists', null=True, on_delete=models.PROTECT)
+    Organization = models.ForeignKey(Organization, related_name='Specialists', on_delete=models.PROTECT)
     code = models.CharField(max_length=100, unique=True, blank=True, null=True)
     def save(self, *args, **kwargs):
         if self.is_deleted:

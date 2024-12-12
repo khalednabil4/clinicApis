@@ -3,7 +3,7 @@ from rest_framework import serializers
 from User.Serializer import *
 
 from  .models import *
-
+from  Clinic.Serializer import *
 class DaysSerializer(serializers.ModelSerializer):
 
     Admin = AdministratorProfileSerializer(read_only=True)
@@ -73,5 +73,39 @@ class DoctoravailabilityCreateSerializer(serializers.ModelSerializer):
         else:
             client = Administrator.objects.get(id=request.user.id)
             self.fields['Doctor'].queryset = Administrator.objects.filter(Organization=client.Organization)
+
+        super().__init__(*args, **kwargs)
+
+
+class ScheduleSerializer(serializers.ModelSerializer):
+
+    Doctoravailability = DoctoravailabilitySerializer(read_only=True)
+    clinic=ClinicSerializer(read_only=True)
+    class Meta:
+        model = Schedule
+        fields = "__all__"
+class ScheduleCreateSerializer(serializers.ModelSerializer):
+    Doctoravailability = serializers.PrimaryKeyRelatedField(
+        queryset=Doctoravailability.objects.all(),
+        required=True
+    )
+    clinic=serializers.PrimaryKeyRelatedField(
+        queryset=Clinic.objects.all(),
+        required=True
+    )
+    class Meta:
+        model = Schedule
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.get('context', {}).get('request', None)
+        if  request.user.is_superuser:
+            self.fields['Doctoravailability'].queryset = Doctoravailability.objects.all()
+            self.fields['clinic'].queryset = Clinic.objects.all()
+        else:
+            client = Administrator.objects.get(id=request.user.id)
+            self.fields['Doctoravailability'].queryset = Doctoravailability.objects.filter(Doctor__Organization=client.Organization)
+            #Edit display Clinic same Specelist
+            self.fields['clinic'].queryset = Clinic.objects.all()
 
         super().__init__(*args, **kwargs)

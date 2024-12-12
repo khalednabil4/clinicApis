@@ -22,9 +22,11 @@ class GenralCRUD(APIView):
         except self.model.DoesNotExist:
             raise Http404
     def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = {'request': self.request}
         return self.serializer_class(*args, **kwargs)
 
     def get_serializer_viw(self, *args, **kwargs):
+        kwargs['context'] = {'request': self.request}
         return self.serializer_class_view(*args, **kwargs)
     @handle_api_exception(error_message="Add False", code=500)
     def post(self, request, format=None):
@@ -74,6 +76,33 @@ class getpatientListFiltered(APIView):
             else:
                 data = patient.objects.filter(Organization=request.user.Organization)
             serializer = AdministratorProfileSerializer(data, many=True)
+            response_data = {
+                'count': data.count(),
+                'data': serializer.data
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+
+
+class PatientHistoryOp(GenralCRUD):
+    permission_classes = [IsAuthenticated]
+    model = PatientHistory
+    serializer_class = PatientHistoryCreateSerializer
+    serializer_class_view=PatientHistorySerializer
+
+
+
+class getPatientHistoryListFiltered(APIView):
+        permission_classes = [IsAuthenticated]
+
+        @handle_api_exception(error_message="Not Found", code=400)
+        def get(self, request):
+            if not  request.user.is_superuser:
+                data = PatientHistory.objects.all()
+            else:
+                client = Administrator.objects.get(id=request.user.id)
+                data = PatientHistory.objects.filter(patient__Organization=client.Organization)
+            serializer = PatientHistorySerializer(data, many=True)
             response_data = {
                 'count': data.count(),
                 'data': serializer.data

@@ -20,4 +20,10 @@ urlpatterns = [
     path('DoctoravailabilityById/<int:pk>/', DoctoravailabilityOp.as_view()),
     path('getDoctoravailabilityListFiltered/', getDoctoravailabilityListFiltered.as_view()),
 
+    path('ScheduleOp/add/', ScheduleOp.as_view()),
+    path('ScheduleOp/edit/<int:pk>/', ScheduleOp.as_view()),
+    path('ScheduleOp/delete/<int:pk>/', ScheduleOp.as_view()),
+    path('ScheduleById/<int:pk>/', ScheduleOp.as_view()),
+    path('getScheduleListFiltered/', getScheduleListFiltered.as_view()),
+
 ]
